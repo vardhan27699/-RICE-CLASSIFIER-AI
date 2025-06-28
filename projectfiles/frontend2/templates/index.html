@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rice Type Detection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      /* Scenic painting-style rice field background */
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      /* Lower the opacity for a much brighter background */
+      background: rgba(255,255,255,0.15);
+      z-index: -1;
+    }
+    .center-hero {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      background: rgba(255,255,255,0.85);
+      padding: 40px 30px 32px 30px;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    }
+    .center-hero h1 {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 18px;
+      color: #222;
+    }
+    .center-hero p {
+      font-size: 1.2em;
+      margin-bottom: 28px;
+      color: #333;
+    }
+    .predict-btn {
+      display: inline-block;
+      padding: 12px 36px;
+      border: 2px solid #4CAF50;
+      background: transparent;
+      color: #4CAF50;
+      font-size: 1.1em;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .predict-btn:hover {
+      background: #4CAF50;
+      color: #fff;
+    }
+    /* Footer nav and logo */
+    .footer-bar {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px 0 30px;
+      background: rgba(0,0,0,0.7);
+      height: 54px;
+      z-index: 10;
+    }
+    .footer-logo {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.2em;
+      letter-spacing: 2px;
+    }
+    .footer-nav {
+      display: flex;
+      gap: 18px;
+    }
+    .footer-nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 6px 14px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .footer-nav a.active, .footer-nav a:hover {
+      background: #4CAF50;
+      color: #fff;
+    }
+    .footer-nav a.predict-btn {
+      border: none;           /* Remove border */
+      outline: none;          /* Remove outline */
+      box-shadow: none;       /* Remove any box shadow */
+    }
+    .footer-nav a.predict-btn:hover {
+      background: #4CAF50;
+      color: #fff;
+    }
+    /* Modal styles for About section */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background: #fff;
+      margin: 5% auto;
+      padding: 32px 24px;
+      border-radius: 16px;
+      max-width: 500px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .close-modal {
+      color: #aaa;
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      font-size: 2em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close-modal:hover {
+      color: #4CAF50;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+    }
+    .about-features {
+      margin-top: 18px;
+    }
+    .about-features div {
+      margin-bottom: 10px;
+    }
+    @media (max-width: 700px) {
+      .center-hero {
+        padding: 18px 6px;
+      }
+      .center-hero h1 {
+        font-size: 1.3em;
+      }
+      .footer-bar {
+        flex-direction: column;
+        height: auto;
+        padding: 8px 4px;
+        gap: 4px;
+      }
+      .footer-logo {
+        font-size: 1em;
+      }
+      .footer-nav {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="center-hero">
+    <h1>Welcome to Rice Type Detection</h1>
+    <p>This model can detect rice type based on rice images.</p>
+    <button onclick="location.href='/details'" class="predict-btn">Predict</button>
+  </div>
+  <div class="footer-bar">
+    <div class="footer-logo">RICE TYPE DETECTION</div>
+    <nav class="footer-nav" style="padding-right: 64px;">
+      <a href="{{ url_for('index') }}" class="active">Home</a>
+      <a href="#about" id="about-link">About</a>
+      <a href="#testimonials" id="testimonials-link">Testimonials</a>
+      <a href="#contact" id="contact-link">Contact</a>
+      <a href="{{ url_for('details') }}" style="margin-right: 0;" class="predict-btn">Predict</a>
+    </nav>
+  </div>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeAbout">&times;</span>
+      <h2>About the Rice Type Classification Model</h2>
+      <p>
+        This model is built using Convolutional Neural Network and trained on labelled images of rice. This model takes image of rice grain as input and gives its prediction for the type of rice.
+      </p>
+      <div class="about-features">
+        <div><strong>Accuracy of the Model:</strong> The model gives right prediction 97 times out of 100.</div>
+        <div><strong>Different Types of Rice:</strong> This model is capable of checking for 5 different rice types.</div>
+        <div><strong>Dataset used:</strong> The dataset of labelled images is obtained from Kaggle.</div>
+        <div><strong>Technical Architecture:</strong> The model is trained on MobileNetv4 Architecture using Transfer Learning.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeContact">&times;</span>
+      <h2>CONTACT US</h2>
+      <div class="contact-box">
+        <div>
+          <h4>Our Address</h4>
+          <p>A108 Adam Street, Pune, India</p>
+        </div>
+        <div>
+          <h4>Email Us</h4>
+          <p>info@example.com<br>contact@example.com</p>
+        </div>
+        <div>
+          <h4>Call Us</h4>
+          <p>+91 55892 55488<br>+91 66782 25444</p>
+        </div>
+      </div>
+      <form>
+        <input type="text" placeholder="Your Name" required>
+        <input type="email" placeholder="Your Email" required>
+        <input type="text" placeholder="Subject" required>
+        <textarea placeholder="Message" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Testimonials Modal -->
+  <div id="testimonialsModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeTestimonials">&times;</span>
+      <div class="testimonial-content" style="text-align:center; max-width:400px; margin:40px auto;">
+        <img src="https://i.pravatar.cc/80?img=12" alt="User Profile" style="border-radius:50%; margin-bottom:10px; width:60px; height:60px;">
+        <h3 style="margin:0;">Matt Brandon</h3>
+        <p style="margin:0 0 10px 0; color:#555;">Wholesaler</p>
+        <blockquote style="font-style:italic; color:#222;">
+          "I check the type of rice before buying it from farmers using this model."
+        </blockquote>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Rice Type Detection. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Show About modal on click
+    document.getElementById('about-link').onclick = function(e) {
+      e.preventDefault();
+      document.getElementById('aboutModal').style.display = 'block';
+    };
+    // Close About modal
+    document.getElementById('closeAbout').onclick = function() {
+      document.getElementById('aboutModal').style.display = 'none';
+    };
+
+    // Show Contact modal on click
+    document.getElementById('contact-link').onclick = function(e) {
+      e.preventDefault();
+      document.getElementById('contactModal').style.display = 'block';
+    };
+    // Close Contact modal
+    document.getElementById('closeContact').onclick = function() {
+      document.getElementById('contactModal').style.display = 'none';
+    };
+
+    // Show Testimonials modal on click
+    document.getElementById('testimonials-link').onclick = function(e) {
+      e.preventDefault();
+      document.getElementById('testimonialsModal').style.display = 'block';
+    };
+    // Close Testimonials modal
+    document.getElementById('closeTestimonials').onclick = function() {
+      document.getElementById('testimonialsModal').style.display = 'none';
+    };
+
+    // Close modals when clicking outside content
+    window.onclick = function(event) {
+      var aboutModal = document.getElementById('aboutModal');
+      var contactModal = document.getElementById('contactModal');
+      var testimonialsModal = document.getElementById('testimonialsModal');
+      if (event.target == aboutModal) {
+        aboutModal.style.display = "none";
+      }
+      if (event.target == contactModal) {
+        contactModal.style.display = "none";
+      }
+      if (event.target == testimonialsModal) {
+        testimonialsModal.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>

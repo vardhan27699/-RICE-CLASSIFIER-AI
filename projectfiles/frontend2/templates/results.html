@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prediction Result</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .footer-bar {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 5vw 0 5vw;
+      background: rgba(0,0,0,0.7);
+      height: 54px;
+      z-index: 10;
+      box-sizing: border-box;
+    }
+    .footer-logo {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.1em;
+      letter-spacing: 2px;
+    }
+    .footer-nav {
+      display: flex;
+      gap: 18px;
+      padding-right: 64px;
+    }
+    .footer-nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 6px 14px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .footer-nav a.active, .footer-nav a:hover {
+      background: #4CAF50;
+      color: #fff;
+    }
+    @media (max-width: 700px) {
+      .footer-bar {
+        flex-direction: column;
+        height: auto;
+        padding: 8px 4px;
+        gap: 4px;
+      }
+      .footer-logo {
+        margin-bottom: 6px;
+      }
+      .footer-nav {
+        gap: 8px;
+        padding-right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="result">
+    <h2>Prediction Result</h2>
+    <p>Predicted Type: <b>{{ prediction_text }}</b></p>
+    {% if confidence %}
+    <p>Confidence: {{ confidence }}%</p>
+    {% endif %}
+    <button onclick="location.href='/details'">Try Another</button>
+  </section>
+  <div class="footer-bar">
+    <div class="footer-logo">RICE TYPE RESULT</div>
+    <nav class="footer-nav">
+      <a href="{{ url_for('index') }}" class="active">Home</a>
+      <a href="#about" id="about-link">About</a>
+      <a href="#testimonials" id="testimonials-link">Testimonials</a>
+      <a href="#contact" id="contact-link">Contact</a>
+      <a href="{{ url_for('details') }}" style="margin-right: 0;" class="predict-btn">Predict</a>
+    </nav>
+  </div>
+</body>
+</html>
